@@ -48,9 +48,9 @@ o	Win rate
 
 Project Structure
 
-Blackjack_gui.py = the graphical version using Pygame
-Blackjack.py = the terminal version 
-Flowchart.png = visual flowchart of game 
+blackjack_gui.py = the graphical version using Pygame
+blackjack.py = the terminal version 
+flowchart.png = visual flowchart of game 
 README.md = this file 
 
 AI Use
