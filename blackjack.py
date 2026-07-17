@@ -78,13 +78,14 @@ def player_turn(deck, player_hand):
         display_hand("Player", player_hand)
         if calculate_hand_value(player_hand) > 21:
             print("You busted!")
-            return False  # Player busts
+            return player_hand
         choice = get_hit_or_stand()
         if choice == "H":
             player_hand.append(deck.pop())
         else:
-            return True  # Player stands
-        
+            return player_hand
+
+
 def dealer_turn(deck, dealer_hand):
     """Handles the dealer's turn."""
     while calculate_hand_value(dealer_hand) < 17:
@@ -92,8 +93,8 @@ def dealer_turn(deck, dealer_hand):
     display_hand("Dealer", dealer_hand)
     if calculate_hand_value(dealer_hand) > 21:
         print("Dealer busted!")
-        return False  # Dealer busts
-    return True  # Dealer stands
+        return dealer_hand
+    return dealer_hand
 
 def determine_winner(player_hand, dealer_hand):
     """Determines the winner of the round."""
@@ -111,6 +112,30 @@ def determine_winner(player_hand, dealer_hand):
     else:
         return "It's a push!"
     
+def update_stats(result, player_hand, dealer_hand):
+    """Updates the running game statistics after each round."""
+    global games_played, player_wins, dealer_wins, pushes, blackjacks_hit, best_hand_margin
+
+    games_played += 1
+
+    if result == "Player wins!":
+        player_wins += 1
+    elif result == "Dealer wins!":
+        dealer_wins += 1
+    else:
+        pushes += 1
+
+    player_value = calculate_hand_value(player_hand)
+    dealer_value = calculate_hand_value(dealer_hand)
+
+    if (player_value == 21 and len(player_hand) == 2) or (dealer_value == 21 and len(dealer_hand) == 2):
+        blackjacks_hit += 1
+
+    margin = abs(player_value - dealer_value)
+    if margin > best_hand_margin:
+        best_hand_margin = margin
+
+
 def show_stats():
     """Displays the game statistics."""
     print(f"Games played: {games_played}")
@@ -139,7 +164,7 @@ def play_round():
     dealer_hand = [deck.pop(), deck.pop()]
  
     print("\n--- New Round ---")
-    display_hand("Dealer", dealer_hand, hide_first=True)
+    display_hand("Dealer", dealer_hand, hide_first_card=True)
     # player_turn() displays the player's hand itself at the start of
     # its loop, so we don't print it again here (that was causing it
     # to show twice).
@@ -151,6 +176,7 @@ def play_round():
         dealer_hand = dealer_turn(deck, dealer_hand)
  
     result = determine_winner(player_hand, dealer_hand)
+    update_stats(result, player_hand, dealer_hand)
     print(f"\n{result}")
  
  
@@ -164,8 +190,9 @@ def get_yes_no(prompt):
             return False
         else:
             print("Please answer with 'y' or 'n'.")
- 
- def main():
+
+
+def main():
     """Main game loop."""
     display_instructions()
 
@@ -175,7 +202,7 @@ def get_yes_no(prompt):
         if not get_yes_no("Do you want to play again? (y/n): "):
             print("Thanks for playing! Final stats:")
             show_stats()
-            break    
+            break
 
 if __name__ == "__main__":
     main()
